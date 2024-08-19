@@ -39,26 +39,16 @@ int main() {
         return 1;
     }
 
-    unsigned char ciphertext[0] = { };
+    unsigned char destination[16] = { 0 };
+    int destinationLen = 0;
+    unsigned char ciphertext[0];
     int ciphertextLen = 0;
-    unsigned char decrypted[0] = { };
-    int decryptedLen = 0;
 
-    if (!EVP_DecryptUpdate(ctx, decrypted, &decryptedLen, ciphertext, ciphertextLen)) {
+    if (!EVP_DecryptUpdate(ctx, destination, &destinationLen, ciphertext, ciphertextLen)) {
         ERR_print_errors_fp(stdout);
         EVP_CIPHER_CTX_free(ctx);
         return 1;
     }
 
-    int finalDecryptLen = 0;
-
-    if (!EVP_DecryptFinal_ex(ctx, decrypted + decryptedLen, &finalDecryptLen)) {
-        ERR_print_errors_fp(stdout);
-        EVP_CIPHER_CTX_free(ctx);
-        return 1;
-    }
-
-    decryptedLen += finalDecryptLen;
-    printf("%i\n", decryptedLen);
-    dump(decrypted, 0);
+    printf("%s\n", "Done.");
 }
