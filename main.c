@@ -11,14 +11,14 @@ void dump(unsigned char* data, int length) {
 }
 
 int main() {
-    EVP_CIPHER* cipher = EVP_CIPHER_fetch(NULL, "AES-128-CFB8", NULL);
+    const EVP_CIPHER* cipher = EVP_aes_128_cfb128();
 
     if (cipher == NULL) {
         ERR_print_errors_fp(stdout);
         return 1;
     }
 
-    EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+    EVP_CIPHER_CTX*  ctx = EVP_CIPHER_CTX_new();
 
     if (ctx == NULL) {
         return 1;
@@ -27,7 +27,7 @@ int main() {
     unsigned char key[16] = { 0 };
     unsigned char iv[16] = { 0 };
 
-    if (!EVP_EncryptInit_ex2(ctx, cipher, key, iv, NULL)) {
+    if (!EVP_DecryptInit_ex2(ctx, cipher, key, iv, NULL)) {
         ERR_print_errors_fp(stdout);
         EVP_CIPHER_CTX_free(ctx);
         return 1;
@@ -39,29 +39,26 @@ int main() {
         return 1;
     }
 
-    unsigned char plaintext[1] = { 0x00 };
-    int ciphertextLen = 16;
-    unsigned char ciphertext[16];
+    unsigned char ciphertext[0] = { };
+    int ciphertextLen = 0;
+    unsigned char decrypted[0] = { };
+    int decryptedLen = 0;
 
-
-    if (!EVP_EncryptUpdate(ctx, ciphertext, &ciphertextLen, plaintext, sizeof(plaintext))) {
+    if (!EVP_DecryptUpdate(ctx, decrypted, &decryptedLen, ciphertext, ciphertextLen)) {
         ERR_print_errors_fp(stdout);
         EVP_CIPHER_CTX_free(ctx);
         return 1;
     }
 
-    printf("%i\n", ciphertextLen);
+    int finalDecryptLen = 0;
 
-    int finalLen = 0;
-
-    if (!EVP_EncryptFinal_ex(ctx, ciphertext + ciphertextLen, &finalLen)) {
+    if (!EVP_DecryptFinal_ex(ctx, decrypted + decryptedLen, &finalDecryptLen)) {
         ERR_print_errors_fp(stdout);
         EVP_CIPHER_CTX_free(ctx);
         return 1;
     }
 
-    ciphertextLen += finalLen;
-    EVP_CIPHER_CTX_free(ctx);
-
-    dump(ciphertext, ciphertextLen);
+    decryptedLen += finalDecryptLen;
+    printf("%i\n", decryptedLen);
+    dump(decrypted, 0);
 }
