@@ -40,7 +40,7 @@ int main() {
     }
 
     unsigned char destination[16] = { 0 };
-    int destinationLen = 0;
+    int destinationLen = 16;
     unsigned char ciphertext[0];
     int ciphertextLen = 0;
 
